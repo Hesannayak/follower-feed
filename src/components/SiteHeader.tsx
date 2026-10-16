@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Wallet } from "lucide-react";
+import { Wallet, Twitter } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type PhantomProvider = {
@@ -61,6 +61,9 @@ export function SiteHeader({ launches, phantom }: { launches: number; phantom: R
           </nav>
         </div>
         <div className="flex items-center gap-3">
+          <a href="https://x.com/groxfun" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Twitter className="h-5 w-5" />
+          </a>
           <span className="rounded-md border border-border px-3 py-2 font-mono text-sm">
             Launches: <span className="text-primary">{launches}</span>
           </span>
