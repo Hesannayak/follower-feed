@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { Rocket, Send, Wallet, Bot, Sparkles, ExternalLink, Copy, Zap, Shield, Lock } from "lucide-react";
+import { SiteHeader, usePhantom } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PumpPilot — Launch meme coins with AI" },
+      { title: "groxfun — Launch meme coins with AI" },
       { name: "description", content: "Chat with an AI bot to launch your meme coin on pump.fun in seconds." },
-      { property: "og:title", content: "PumpPilot — Launch meme coins with AI" },
+      { property: "og:title", content: "groxfun — Launch meme coins with AI" },
       { property: "og:description", content: "Chat with an AI bot to launch your meme coin on pump.fun in seconds." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -31,7 +32,8 @@ const fmt = (n?: number) => (n == null ? "—" : n >= 1e6 ? `$${(n / 1e6).toFixe
 type Msg = { role: "bot" | "user"; text: string };
 
 function Index() {
-  const [wallet, setWallet] = useState<string | null>(null);
+  const phantom = usePhantom();
+  const wallet = phantom.wallet;
   const [model, setModel] = useState<"self" | "platform">("self");
   const [launches, setLaunches] = useState<Launch[]>(SAMPLE);
   const [form, setForm] = useState({ name: "", symbol: "", description: "", image: "", twitter: "", telegram: "", devBuy: "0.1" });
