@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Rocket, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type PhantomProvider = {
@@ -53,7 +53,7 @@ export function SiteHeader({ launches, phantom }: { launches: number; phantom: R
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2 text-xl font-bold">
-            <Rocket className="h-6 w-6 text-primary" /> grox<span className="text-primary">fun</span>
+            <img src="/logo.png" alt="groxfun" className="h-7 w-7" /> grox<span className="text-primary">fun</span>
           </Link>
           <nav className="flex gap-4 text-sm text-muted-foreground">
             <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground" }}>Launch</Link>
