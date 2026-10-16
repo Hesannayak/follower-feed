@@ -108,19 +108,7 @@ function Index() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-border">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2 text-xl font-bold">
-            <Rocket className="h-6 w-6 text-primary" /> Pump<span className="text-primary">Pilot</span>
-          </div>
-          <button
-            onClick={() => setWallet(wallet ? null : "8fJk...3Xa9")}
-            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
-          >
-            <Wallet className="h-4 w-4" /> {wallet ? <span className="font-mono">{wallet}</span> : "Connect wallet"}
-          </button>
-        </div>
-      </header>
+      <SiteHeader launches={MINTS.length + launches.length} phantom={phantom} />
 
       <section className="mx-auto max-w-7xl px-6 pt-12 pb-8">
         <p className="font-mono text-xs uppercase tracking-widest text-accent">AI-powered · pump.fun · Solana</p>
