@@ -78,9 +78,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PumpPilot — AI meme coin launchpad" },
+      { title: "groxfun — AI meme coin launchpad" },
       { name: "description", content: "Launch meme coins on pump.fun by chatting with an AI bot." },
-      { property: "og:title", content: "PumpPilot — AI meme coin launchpad" },
+      { property: "og:title", content: "groxfun — AI meme coin launchpad" },
       { property: "og:description", content: "Launch meme coins on pump.fun by chatting with an AI bot." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

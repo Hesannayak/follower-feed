@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { Rocket, Send, Wallet, Bot, Sparkles, ExternalLink, Copy, Zap, Shield, Lock } from "lucide-react";
+import { SiteHeader, usePhantom } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PumpPilot — Launch meme coins with AI" },
+      { title: "groxfun — Launch meme coins with AI" },
       { name: "description", content: "Chat with an AI bot to launch your meme coin on pump.fun in seconds." },
-      { property: "og:title", content: "PumpPilot — Launch meme coins with AI" },
+      { property: "og:title", content: "groxfun — Launch meme coins with AI" },
       { property: "og:description", content: "Chat with an AI bot to launch your meme coin on pump.fun in seconds." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -31,7 +32,8 @@ const fmt = (n?: number) => (n == null ? "—" : n >= 1e6 ? `$${(n / 1e6).toFixe
 type Msg = { role: "bot" | "user"; text: string };
 
 function Index() {
-  const [wallet, setWallet] = useState<string | null>(null);
+  const phantom = usePhantom();
+  const wallet = phantom.wallet;
   const [model, setModel] = useState<"self" | "platform">("self");
   const [launches, setLaunches] = useState<Launch[]>(SAMPLE);
   const [form, setForm] = useState({ name: "", symbol: "", description: "", image: "", twitter: "", telegram: "", devBuy: "0.1" });
@@ -108,19 +110,7 @@ function Index() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-border">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2 text-xl font-bold">
-            <Rocket className="h-6 w-6 text-primary" /> Pump<span className="text-primary">Pilot</span>
-          </div>
-          <button
-            onClick={() => setWallet(wallet ? null : "8fJk...3Xa9")}
-            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
-          >
-            <Wallet className="h-4 w-4" /> {wallet ? <span className="font-mono">{wallet}</span> : "Connect wallet"}
-          </button>
-        </div>
-      </header>
+      <SiteHeader launches={MINTS.length + launches.length} phantom={phantom} />
 
       <section className="mx-auto max-w-7xl px-6 pt-12 pb-8">
         <p className="font-mono text-xs uppercase tracking-widest text-accent">AI-powered · pump.fun · Solana</p>
