@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
-import { Rocket, Send, Wallet, Bot, Sparkles, ExternalLink, Copy, Zap, Shield } from "lucide-react";
+import { Rocket, Send, Wallet, Bot, Sparkles, ExternalLink, Copy, Zap, Shield, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,13 +17,16 @@ export const Route = createFileRoute("/")({
 });
 
 type Launch = { name: string; symbol: string; mint: string; progress: number; mcap: string; emoji: string; graduated?: boolean };
+const SAMPLE: Launch[] = [];
 
-const SAMPLE: Launch[] = [
-  { name: "Frog Overlord", symbol: "FROGL", mint: "7xKp...q9Fz", progress: 100, mcap: "$71.2K", emoji: "🐸", graduated: true },
-  { name: "Cat in Space", symbol: "SPCAT", mint: "3mRt...Lw2a", progress: 64, mcap: "$28.4K", emoji: "🐱" },
-  { name: "Based Toast", symbol: "TOAST", mint: "9pQe...Hn7c", progress: 37, mcap: "$12.9K", emoji: "🍞" },
-  { name: "Moon Hamster", symbol: "HAMMY", mint: "Bv4s...Xk1d", progress: 12, mcap: "$5.1K", emoji: "🐹" },
+const MINTS = [
+  "AR895BAyuecNzyaoKLEftBNGhSMxgXnWCe375y74pump",
+  "E9Ffrfzdcm4mTRBscHehk7pvja6naH1gbYXT1gffpump",
+  "GiGzoMvKjabZXCoB5booniT49vTFQffiQ4Q86LpRpump",
+  "mmhTKrNXPZeeyxcAf8RcvAHozf8fRPx98pRjRYApump",
 ];
+type TokenInfo = { mint: string; name: string; symbol: string; image?: string; mcap: string; vol: string; price: string; change: number; graduated: boolean };
+const fmt = (n?: number) => (n == null ? "—" : n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `$${(n / 1e3).toFixed(1)}K` : `$${n.toFixed(0)}`);
 
 type Msg = { role: "bot" | "user"; text: string };
 
@@ -39,6 +42,29 @@ function Index() {
   const [launching, setLaunching] = useState(false);
   const chatEnd = useRef<HTMLDivElement>(null);
   useEffect(() => chatEnd.current?.scrollIntoView({ behavior: "smooth" }), [msgs]);
+  const [tokens, setTokens] = useState<TokenInfo[]>([]);
+  useEffect(() => {
+    fetch(`https://api.dexscreener.com/latest/dex/tokens/${MINTS.join(",")}`)
+      .then((r) => r.json())
+      .then((d: { pairs?: any[] }) => {
+        const out: TokenInfo[] = MINTS.map((mint) => {
+          const p = (d.pairs ?? []).filter((x) => x.baseToken?.address === mint).sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
+          return {
+            mint,
+            name: p?.baseToken?.name ?? "Unknown",
+            symbol: p?.baseToken?.symbol ?? "???",
+            image: p?.info?.imageUrl,
+            mcap: fmt(p?.marketCap ?? p?.fdv),
+            vol: fmt(p?.volume?.h24),
+            price: p?.priceUsd ? `$${Number(p.priceUsd).toPrecision(3)}` : "—",
+            change: p?.priceChange?.h24 ?? 0,
+            graduated: p ? p.dexId !== "pumpfun" : false,
+          };
+        });
+        setTokens(out);
+      })
+      .catch(() => setTokens(MINTS.map((mint) => ({ mint, name: "Unavailable", symbol: "???", mcap: "—", vol: "—", price: "—", change: 0, graduated: false }))));
+  }, []);
 
   const sendChat = () => {
     if (!input.trim()) return;
@@ -97,16 +123,16 @@ function Index() {
       <section className="mx-auto max-w-7xl px-6 pt-12 pb-8">
         <p className="font-mono text-xs uppercase tracking-widest text-accent">AI-powered · pump.fun · Solana</p>
         <h1 className="mt-3 text-5xl font-bold leading-tight md:text-6xl">
-          Say it. <span className="text-primary">Ship the coin.</span>
+          Grokbot <span className="text-primary">launchpad</span>
         </h1>
         <p className="mt-4 max-w-2xl text-muted-foreground">
-          Describe your meme. Our bot writes the metadata, uploads it to IPFS and launches on the bonding curve — graduating to PumpSwap when it fills.
+          Say it, grokbot will launch for you. Our Grok bot writes the metadata, uploads it to IPFS and launches on the bonding curve — graduating to PumpSwap when it fills.
         </p>
       </section>
 
       <main className="mx-auto grid max-w-7xl gap-6 px-6 pb-12 lg:grid-cols-2">
         {/* Chat */}
-        <div className="flex h-[600px] flex-col rounded-xl border border-border bg-card">
+        <div className="relative flex h-[600px] flex-col overflow-hidden rounded-xl border border-border bg-card">
           <div className="flex items-center gap-2 border-b border-border px-5 py-3 font-semibold">
             <Bot className="h-5 w-5 text-primary" /> Launch bot
             <span className="ml-auto flex items-center gap-1 font-mono text-xs text-primary"><span className="h-2 w-2 rounded-full bg-primary animate-pulse" /> online</span>
@@ -122,6 +148,10 @@ function Index() {
           <div className="flex gap-2 border-t border-border p-3">
             <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendChat()} placeholder="launch a coin called…" className={field} />
             <button onClick={sendChat} className="rounded-md bg-primary px-3 text-primary-foreground" aria-label="Send"><Send className="h-4 w-4" /></button>
+          </div>
+          <div className="absolute inset-0 top-[49px] flex flex-col items-center justify-center gap-3 bg-background/80 p-6 text-center backdrop-blur-sm">
+            <Lock className="h-10 w-10 text-primary" />
+            <p className="text-xl font-bold">Hold 1M $Groxbot Token to launch token</p>
           </div>
         </div>
 
@@ -157,25 +187,29 @@ function Index() {
 
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <h2 className="mb-4 text-2xl font-bold">Recent launches</h2>
+        {tokens.length === 0 && <p className="font-mono text-sm text-muted-foreground">Loading on-chain data…</p>}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {launches.map((l) => (
-            <div key={l.mint} className="rounded-xl border border-border bg-card p-4">
+          {tokens.map((t) => (
+            <div key={t.mint} className="rounded-xl border border-border bg-card p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-2xl">{l.emoji}</div>
-                <div>
-                  <div className="font-semibold">{l.name}</div>
-                  <div className="font-mono text-xs text-primary">${l.symbol}</div>
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-secondary text-2xl">
+                  {t.image ? <img src={t.image} alt={t.name} className="h-full w-full object-cover" /> : "🚀"}
                 </div>
-                {l.graduated && <span className="ml-auto rounded bg-accent px-2 py-0.5 text-[10px] font-bold text-accent-foreground">PUMPSWAP</span>}
+                <div className="min-w-0">
+                  <div className="truncate font-semibold">{t.name}</div>
+                  <div className="font-mono text-xs text-primary">${t.symbol}</div>
+                </div>
+                {t.graduated && <span className="ml-auto rounded bg-accent px-2 py-0.5 text-[10px] font-bold text-accent-foreground">PUMPSWAP</span>}
               </div>
-              <div className="mt-4 flex justify-between font-mono text-xs text-muted-foreground"><span>Bonding curve</span><span>{l.progress}%</span></div>
-              <div className="mt-1 h-2 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-primary" style={{ width: `${l.progress}%` }} /></div>
-              <div className="mt-3 flex items-center justify-between font-mono text-xs">
-                <span>MC {l.mcap}</span>
-                <span className="flex items-center gap-2 text-muted-foreground">
-                  {l.mint}
-                  <Copy className="h-3 w-3 cursor-pointer hover:text-foreground" onClick={() => navigator.clipboard?.writeText(l.mint)} />
-                  <ExternalLink className="h-3 w-3" />
+              <div className="mt-4 grid grid-cols-2 gap-1 font-mono text-xs text-muted-foreground">
+                <span>MC {t.mcap}</span><span className="text-right">Vol 24h {t.vol}</span>
+                <span>Price {t.price}</span><span className={`text-right ${t.change >= 0 ? "text-primary" : "text-destructive"}`}>{t.change >= 0 ? "+" : ""}{t.change.toFixed(1)}%</span>
+              </div>
+              <div className="mt-3 flex items-center justify-between font-mono text-xs text-muted-foreground">
+                <span>{t.mint.slice(0, 4)}...{t.mint.slice(-4)}</span>
+                <span className="flex items-center gap-2">
+                  <Copy className="h-3 w-3 cursor-pointer hover:text-foreground" onClick={() => navigator.clipboard?.writeText(t.mint)} />
+                  <a href={`https://pump.fun/coin/${t.mint}`} target="_blank" rel="noreferrer"><ExternalLink className="h-3 w-3 hover:text-foreground" /></a>
                 </span>
               </div>
             </div>
