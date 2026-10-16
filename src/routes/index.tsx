@@ -41,7 +41,9 @@ function Index() {
   const [input, setInput] = useState("");
   const [launching, setLaunching] = useState(false);
   const chatEnd = useRef<HTMLDivElement>(null);
-  useEffect(() => chatEnd.current?.scrollIntoView({ behavior: "smooth" }), [msgs]);
+  useEffect(() => {
+    chatEnd.current?.scrollIntoView({ behavior: "smooth" });
+  }, [msgs]);
   const [tokens, setTokens] = useState<TokenInfo[]>([]);
   useEffect(() => {
     fetch(`https://api.dexscreener.com/latest/dex/tokens/${MINTS.join(",")}`)
